@@ -1,17 +1,18 @@
-const { settings } = require('./Constants') 
+const { settings, population } = require('./Constants') 
 
 module.exports.check = async () => {
     cleanDead()
 
     let name = Object.keys(Game.creeps).length
-    for(let role in settings){
+    let settingsSorted = Object.entries(settings).sort((a, b) => a[1].priority - b[1].priority)
+
+    for(let [role, data] of settingsSorted){
         let count = getCountFor(role)
         let spawn = Game.spawns['Spawn1']
-        while(count < settings[role].population){
+        while(count < population[role]){
             if(!spawn.spawning) {
-                const res = require(`./roles/${settings[role].name}.js`).spawn(spawn, `${settings[role].name} ${name + 1}`, { memory: {
-                    role: role,
-                    ...settings[role].defaultMemory
+                const res = require(`./roles/${data.name}.js`).spawn(spawn, `${data.name} ${name + 1}`, { memory: {
+                    role, ...data.defaultMemory
                 }})
 
                 if(res == OK) name++

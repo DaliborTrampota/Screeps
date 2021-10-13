@@ -35,6 +35,15 @@ module.exports.loop = function () {
 
 		require(`./roles/${settings[creep.memory.role].name}`).run(creep)
 	}
+
+	for(let structName in Game.structures){
+		let struct = Game.structures[structName]
+		switch(struct.structureType){
+			case STRUCTURE_TOWER:
+				require('./structures/Tower.js').run(struct)
+				break
+		}
+	}
 	
 	if (Game.cpu.bucket >= 10000) Game.cpu.generatePixel();
 }

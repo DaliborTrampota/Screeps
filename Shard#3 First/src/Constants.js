@@ -22,9 +22,17 @@ module.exports.states = states
 module.exports.STORAGE_STRUCTS = [STRUCTURE_STORAGE, STRUCTURE_CONTAINER, STRUCTURE_LINK]
 module.exports.PRIORITY_ENERGY = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_TOWER]
 
+module.exports.population = {
+    [roles.HARVESTER]: 3,
+    [roles.UPGRADER]: 2,
+    [roles.BUILDER]: 2,
+    [roles.RUNNER]: 1,
+    [roles.REPAIRER]: 2,
+    [roles.FIGHTER]: 0
+}
+
 module.exports.settings = {
     [roles.HARVESTER]: {
-        population: 3,
         priority: 1,
         parts: {
             base: [WORK, MOVE, CARRY],
@@ -35,7 +43,6 @@ module.exports.settings = {
         defaultMemory: {}
     },
     [roles.UPGRADER]: {
-        population: 1,
         priority: 5,
         parts: {
             base: [WORK, MOVE, CARRY],
@@ -48,7 +55,6 @@ module.exports.settings = {
         }
     },
     [roles.RUNNER]: {
-        population: 2,
         priority: 2,
         parts: {
             base: [CARRY, CARRY, MOVE],
@@ -61,7 +67,6 @@ module.exports.settings = {
         }
     },
     [roles.BUILDER]: {
-        population: 3,
         priority: 4,
         parts: {
             base: [WORK, CARRY, MOVE],
@@ -74,7 +79,6 @@ module.exports.settings = {
         }
     },
     [roles.REPAIRER]: {
-        population: 2,
         priority: 3,
         parts: {
             base: [WORK, CARRY, MOVE],
@@ -88,11 +92,10 @@ module.exports.settings = {
         }
     },
     [roles.FIGHTER]: {
-        population: 0,
         priority: 1,
         parts: {
-            base: [TOUGH, ATTACK, MOVE],
-            advanced: [TOUGH, TOUGH, ATTACK, ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE]
+            base: [TOUGH, ATTACK, MOVE, MOVE],
+            advanced: [TOUGH, ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE, MOVE]
         },
         build: "advanced",
         name: "Fighter",
