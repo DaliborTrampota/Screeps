@@ -11,7 +11,7 @@ module.exports.check = async () => {
         let spawn = Game.spawns['Spawn1']
         while(count < population[role]){
             if(!spawn.spawning) {
-                const res = require(`./roles/${data.name}.js`).spawn(spawn, `${data.name} ${name + 1}`, { memory: {
+                const res = require(`./roles/${data.name}`).spawn(spawn, `${data.name} ${name + 1}`, { memory: {
                     role, ...data.defaultMemory
                 }})
 

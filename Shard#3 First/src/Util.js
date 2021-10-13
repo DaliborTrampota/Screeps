@@ -10,7 +10,7 @@ module.exports = class Util {
         if(target) return { id: target.id, temp: false }
 
         //If none found find closest deposit target
-        return this.findDepositTarget()
+        return this.findDepositTarget(creep)
     }
 
     /** @param {Creep} creep */
