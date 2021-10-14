@@ -69,7 +69,7 @@ module.exports = class Repairer extends Base {
         
         if(!creep.memory.repairQueue.length){
             let toRepair = creep.room.find(FIND_STRUCTURES, { filter: s => s.hitsMax - s.hits })
-            switch(Number(creep.memory.repairType)){
+            switch(Number(creep.memory.type)){
                 case repairTypes.ROAD: default:
                     toRepair = toRepair.filter(s => s.structureType === STRUCTURE_ROAD)
                     break
