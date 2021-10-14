@@ -1,54 +1,29 @@
-const { settings, population } = require('./Constants') 
+const { settings, population } = require('./Constants')
+const Util = require('./Util')
 
 module.exports.check = async () => {
-    cleanDead()
 
-    let name = Object.keys(Game.creeps).length
-    let settingsSorted = Object.entries(settings).sort((a, b) => a[1].priority - b[1].priority)
+    Util.cleanDead()
+    let settingsSorted = Object.entries(settings).sort((a, b) => b[1].priority - a[1].priority)
 
     for(let [role, data] of settingsSorted){
-        let count = getCountFor(role)
+        let count = Util.getCountFor(role)
+        let name = 1
         let spawn = Game.spawns['Spawn1']
         while(count < population[role]){
             if(!spawn.spawning) {
-                const res = require(`./roles/${data.name}`).spawn(spawn, `${data.name} ${name + 1}`, { memory: {
+                const res = require(`./roles/${data.name}`).spawn(spawn, `${data.name} ${name}`, {
                     role, ...data.defaultMemory
-                }})
+                })
 
-                if(res == OK) name++
+                if(res === OK) name++
                 else if(res == ERR_NAME_EXISTS) {
                     name++
                     continue
                 }
+                if(count === 0 && res !== OK) return //Makes sure if there is no creep with the role it waits for the required energy for it to spawn one
             }
             count++
         }
     }
-}
-
-function getCountFor(role){
-    return _.filter(Game.creeps, (creep) => creep.memory.role == role).length
-}
-
-function cleanDead(){
-    let deleted = false
-    for(let creepName in Memory.creeps){
-        if(!Game.creeps[creepName]){
-            deleted = true
-            delete Memory.creeps[creepName]
-        }
-    }
-
-    if(deleted){
-        for(let r in Game.rooms){
-            for(let sID in Memory.sources[r]) Memory.sources[r][sID] = 0
-        }
-    
-        for(let creepName in Game.creeps){
-            let c = Game.creeps[creepName]
-            if(!c.memory.sourceID) continue
-            Memory.sources[c.room.name][c.memory.sourceID]++
-        }
-    }
-    
 }

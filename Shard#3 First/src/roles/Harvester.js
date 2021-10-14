@@ -16,7 +16,7 @@ module.exports = class Harvester extends Base {
         let source = Util.setSource(creep)
         if(!source) return
         
-        if(creep.harvest(source) == ERR_NOT_IN_RANGE){
+        if(creep.harvest(source) === ERR_NOT_IN_RANGE){
             creep.moveTo(source)
         }
     }

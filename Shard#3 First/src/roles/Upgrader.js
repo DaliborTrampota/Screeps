@@ -6,6 +6,7 @@ module.exports = class Upgrader extends Base {
 
     /** @param {Creep} creep */
     static run(creep){
+        
         this.checkState(creep)
         
         if(creep.memory.upgrading){

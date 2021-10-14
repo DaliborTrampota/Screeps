@@ -7,29 +7,38 @@ const roles = {
     FIGHTER: 5
 }
 
+module.exports.USERNAME = "KokoNeot"
+module.exports.WALL_THRESHOLD = 2500
+module.exports.REPAIR_QUEUE_LEN = 5
+module.exports.roles = roles
+
+module.exports.STORAGE_STRUCTS = [STRUCTURE_STORAGE, STRUCTURE_CONTAINER, STRUCTURE_LINK]
+module.exports.PRIORITY_ENERGY = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_TOWER]
+
+module.exports.population = {
+    [roles.HARVESTER]: 4,
+    [roles.UPGRADER]: 1,
+    [roles.BUILDER]: 1,
+    [roles.RUNNER]: 2,
+    [roles.REPAIRER]: 3,
+    [roles.FIGHTER]: 0
+}
+
 const states = {
     WITHDRAW: 0,
     DEPOSIT: 1,
     PULLING: 2
 }
 
-module.exports.USERNAME = "KokoNeot"
-module.exports.WALL_THRESHOLD = 2500
-module.exports.REPAIR_QUEUE_LEN = 5
-module.exports.roles = roles
-module.exports.states = states
-
-module.exports.STORAGE_STRUCTS = [STRUCTURE_STORAGE, STRUCTURE_CONTAINER, STRUCTURE_LINK]
-module.exports.PRIORITY_ENERGY = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_TOWER]
-
-module.exports.population = {
-    [roles.HARVESTER]: 3,
-    [roles.UPGRADER]: 2,
-    [roles.BUILDER]: 2,
-    [roles.RUNNER]: 1,
-    [roles.REPAIRER]: 2,
-    [roles.FIGHTER]: 0
+const repairTypes = {
+    NONE: -1,
+    ROAD: 0,
+    STRUCTURE: 1,
+    WALL: 2
 }
+
+module.exports.repairTypes = repairTypes
+module.exports.states = states
 
 module.exports.settings = {
     [roles.HARVESTER]: {
@@ -64,7 +73,8 @@ module.exports.settings = {
         name: "Runner",
         defaultMemory: {
             state: states.WITHDRAW 
-        }
+        },
+        pathColor: "#00ff00"
     },
     [roles.BUILDER]: {
         priority: 4,
@@ -88,8 +98,10 @@ module.exports.settings = {
         name: "Repairer",
         defaultMemory: { 
             repairing: false,
-            repairQueue: []
-        }
+            repairQueue: [],
+            type: repairTypes.NONE
+        },
+        pathColor: "#ffff00" 
     },
     [roles.FIGHTER]: {
         priority: 1,

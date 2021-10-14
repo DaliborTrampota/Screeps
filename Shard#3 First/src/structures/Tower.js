@@ -1,15 +1,20 @@
-const Base = require('./BaseStructure.js')
+const Base = require('./BaseStructure')
 
 module.exports = class Tower extends Base {
 
     /** @param {StructureTower} struct */
     static run(struct){
-        let target = this.getTarget(struct)
-        struct.attack(target)
+        return
+        let enemies = this.findEnemies(struct)
+        if(enemies.length) return struct.attack[target[0]]
+
+        let damagedStructs = this.findForRepair(struct)
+        if(damagedStructs.length) return struct.repair(damagedStructs[0])
+        
     }
 
     /** @param {StructureTower} struct */
-    static getTarget(struct){
+    static getTarget(struct){ //TODO implement into Memory since structs dont have memory
         if(!struct.memory.targetQueue || !struct.memory.targetQueue.length){
             struct.memory.targetQueue = this.findEnemies(struct)
         }
