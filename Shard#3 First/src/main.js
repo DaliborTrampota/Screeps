@@ -1,6 +1,10 @@
-const { settings, roles } = require('./Constants')
+const { settings } = require('./Constants')
 const Spawner = require('./Spawner')
 const Util = require('./Util')
+
+let showStats = false
+let cpuUsage = { iter: 0, data: {} }
+let startCPU
 
 module.exports.loop = function () {
 
@@ -10,14 +14,8 @@ module.exports.loop = function () {
         Memory.sources = { }
     }*/
 
+	showStats = Game.time % 100 === 0
 
-	for(let spawnName in Game.spawns){
-		const spawn = Game.spawns[spawnName]
-		spawn.room.visual.text(spawn.room.energyAvailable + '/' + spawn.room.energyCapacityAvailable, spawn.pos.x, spawn.pos.y + 1)
-		if(spawn.spawning){
-			spawn.room.visual.text(`${spawn.spawning.name} (${100 - Math.floor(spawn.spawning.remainingTime / spawn.spawning.needTime * 100)}%)`, spawn.pos.x + 4, spawn.pos.y)
-		}
-	}
 
 	for(let roomName in Game.rooms){
 		//if(Memory.sources[roomName].closestToController) continue
@@ -43,8 +41,15 @@ module.exports.loop = function () {
 			//creep.memory.role = roles.HARVESTER
 			continue
 		}
+		
+		if(!cpuUsage.data.hasOwnProperty(creep.memory.role)) cpuUsage.data[creep.memory.role] = 0
+		startCPU = Game.cpu.getUsed()
+		
 		require(`./roles/${settings[creep.memory.role].name}`).run(creep)
+
+		cpuUsage.data[creep.memory.role] += Game.cpu.getUsed() - startCPU
 	}
+	++cpuUsage.iter
 	
 
 	for(let structName in Game.structures){
@@ -56,13 +61,25 @@ module.exports.loop = function () {
 		}
 	}
 
-	/*if(Game.time % 10 === 0) {
-		let str = `Stats\n`
-		for(let role in roles){
-			str += `${settings[role].name}: ${Util.getCountFor(role)}\n`
+	for(let spawnName in Game.spawns){
+		const spawn = Game.spawns[spawnName]
+		spawn.room.visual.text(spawn.room.energyAvailable + '/' + spawn.room.energyCapacityAvailable, spawn.pos.x, spawn.pos.y + 1)
+		if(spawn.spawning){
+			spawn.room.visual.text(`${spawn.spawning.name} (${100 - Math.floor(spawn.spawning.remainingTime / spawn.spawning.needTime * 100)}%)`, spawn.pos.x + 4, spawn.pos.y)
+		}
+	}
+
+
+	if(showStats) {
+		let str = `Stats - Average of ${cpuUsage.iter} ticks\n` 
+		for(let role in settings){
+			if(!cpuUsage.data[role]) continue
+			str += `${settings[role].name}: ${Util.getCountFor(role)} (${(cpuUsage.data[role] / cpuUsage.iter).toFixed(3)})\n`
+			cpuUsage.data[role] = 0
 		}
 		console.log(str)
-	}*/
+		cpuUsage.iter = 0
+	}
 	
 	if (Game.cpu.bucket >= 10000) Game.cpu.generatePixel();
 }
