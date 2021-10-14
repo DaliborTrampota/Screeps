@@ -37,7 +37,8 @@ module.exports = class Repairer extends Base {
     static checkState(creep){
         if(creep.memory.type === repairTypes.NONE){
             let repairers = _.filter(Game.creeps, c => c.memory.role === roles.REPAIRER)
-            let wall = struct = road = 0
+            let wall = 0, struct = 0, road = 0;
+
             for(let rep of repairers){
                 switch(Number(rep.memory.type)){
                     case repairTypes.WALL:
