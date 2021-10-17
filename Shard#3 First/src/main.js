@@ -8,18 +8,16 @@ let startCPU
 
 module.exports.loop = function () {
 
-	Spawner.check()
-
 	/*if(!Memory.sources){
         Memory.sources = { }
     }*/
-
 	showStats = Game.time % 100 === 0
 
-
 	for(let roomName in Game.rooms){
+		Spawner.check(Game.rooms[roomName])
+
 		if(!Memory.rooms[roomName]) Memory.rooms[roomName] = {}
-		if(!Memory.rooms[roomName].toRepair) Memory.rooms[roomName].toRepair = []
+		if(!Memory.rooms[roomName].toRepair) Memory.rooms[roomName] = {}
 		//if(Memory.sources[roomName].closestToController) continue
 
 		if(!Memory.sources[roomName]){
@@ -27,10 +25,6 @@ module.exports.loop = function () {
 			let sources = Game.rooms[roomName].find(FIND_SOURCES)
 			for(let s of sources) Memory.sources[roomName][s.id] = 0
 		}
-
-		/*let source = Game.rooms[roomName].controller.pos.findClosestByPath(FIND_SOURCES)
-		if(source) Memory.sources[roomName].closestToController = source.id
-		*/
 	}
 
 	for(let creepName in Game.creeps){
@@ -40,7 +34,6 @@ module.exports.loop = function () {
 		if(creep.memory.role == undefined || creep.memory.role == null ) {
 			console.log(`Creep ${creep.name} has no role`)
 			Game.notify(`Creep ${creep.name} has no role`, 5)
-			//creep.memory.role = roles.HARVESTER
 			continue
 		}
 		
@@ -79,9 +72,9 @@ module.exports.loop = function () {
 			str += `${settings[role].name}: ${Util.getCountFor(role)} (${(cpuUsage.data[role] / cpuUsage.iter).toFixed(3)})\n`
 			cpuUsage.data[role] = 0
 		}
-		console.log(str)
 		cpuUsage.iter = 0
+		console.log(str)
 	}
 	
-	if (Game.cpu.bucket >= 10000) Game.cpu.generatePixel();
+	if(Game.cpu.bucket >= 10000) Game.cpu.generatePixel();
 }

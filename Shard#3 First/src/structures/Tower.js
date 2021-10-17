@@ -4,11 +4,12 @@ module.exports = class Tower extends Base {
 
     /** @param {StructureTower} struct */
     static run(struct){
-        return
         let enemies = this.findEnemies(struct)
-        if(enemies.length) return struct.attack[target[0]]
+        if(enemies.length)
+            return struct.attack(enemies[0])
 
-        let damagedStructs = this.findForRepair(struct)
+        return
+        let damagedStructs = struct.room.find(FIND_STRUCTURES, { filter: s => s.hits !== s.hitsMax && ![STRUCTURE_WALL, STRUCTURE_RAMPART].includes(s.structureType) })
         if(damagedStructs.length) return struct.repair(damagedStructs[0])
         
     }

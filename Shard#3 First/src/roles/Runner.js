@@ -10,7 +10,7 @@ module.exports = class Runner extends Base{
 
         this.checkState(creep)
         
-        if(creep.memory.state === states.WITHDRAW){
+        if(creep.memory.state == states.WITHDRAW){
             let structure = Game.getObjectById(creep.memory.withdrawTarget)
             if(!structure || structure.resourceType !== 'energy' && structure.store[RESOURCE_ENERGY] === 0) return delete creep.memory.withdrawTarget
             
@@ -21,7 +21,7 @@ module.exports = class Runner extends Base{
             return
         }
 
-        if(creep.memory.state === states.DEPOSIT){
+        if(creep.memory.state == states.DEPOSIT){
             let structure = Game.getObjectById(creep.memory.depositTarget)
             if(!structure) return delete creep.memory.depositTarget
 
@@ -30,12 +30,6 @@ module.exports = class Runner extends Base{
             else if(transfer === ERR_FULL) delete creep.memory.depositTarget
             return
         }
-
-        /*if(creep.memory.state === states.PULLING){
-            let builders = _.filter(Game.creeps, creep => creep.memory.role == roles.BUILDER)
-            if(creep.pull(builders[0]) === ERR_NOT_IN_RANGE)
-                creep.moveTo(builders[0])
-        }*/
     }
 
     /** @param {Creep} creep */
@@ -47,7 +41,7 @@ module.exports = class Runner extends Base{
             }
 
             if(!creep.memory.withdrawTarget){
-                let target = Util.findEnergy(creep)
+                let target = this.findDroppedMinerals(creep) || Util.findEnergy(creep, false)
                 if(target) creep.memory.withdrawTarget = target.id
             }
         }
@@ -63,6 +57,14 @@ module.exports = class Runner extends Base{
                 if(target) creep.memory.depositTarget = target.id
             }
         }
+    }
+
+    /** @param {Creep} creep */
+    static findDroppedMinerals(creep){
+        let dropped = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES)
+        if(dropped) return dropped
+
+        return false
     }
 
 }

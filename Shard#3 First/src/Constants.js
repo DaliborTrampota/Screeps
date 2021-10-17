@@ -4,7 +4,8 @@ const roles = {
     BUILDER: 2,
     RUNNER: 3,
     REPAIRER: 4,
-    FIGHTER: 5
+    FIGHTER: 5,
+    SCOUT: 6
 }
 
 module.exports.USERNAME = "KokoNeot"
@@ -14,15 +15,6 @@ module.exports.roles = roles
 
 module.exports.STORAGE_STRUCTS = [STRUCTURE_STORAGE, STRUCTURE_CONTAINER, STRUCTURE_LINK]
 module.exports.PRIORITY_ENERGY = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_TOWER]
-
-module.exports.population = {
-    [roles.HARVESTER]: 3,
-    [roles.UPGRADER]: 1,
-    [roles.BUILDER]: 1,
-    [roles.RUNNER]: 0,
-    [roles.REPAIRER]: 2,
-    [roles.FIGHTER]: 0
-}
 
 const states = {
     WITHDRAW: 0,
@@ -47,7 +39,6 @@ module.exports.settings = {
             base: [WORK, MOVE, CARRY],
             advanced: [WORK, WORK, WORK, MOVE, CARRY]
         },
-        build: "base",
         name: "Harvester",
         defaultMemory: {}
     },
@@ -57,7 +48,6 @@ module.exports.settings = {
             base: [WORK, MOVE, CARRY],
             advanced: [WORK, WORK, CARRY, CARRY, MOVE, MOVE]
         },
-        build: "base",
         name: "Upgrader",
         defaultMemory: { 
             upgrading: false 
@@ -69,7 +59,6 @@ module.exports.settings = {
             base: [CARRY, CARRY, MOVE],
             advanced: [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE]
         },
-        build: "advanced",
         name: "Runner",
         defaultMemory: {
             state: states.WITHDRAW 
@@ -82,7 +71,6 @@ module.exports.settings = {
             base: [WORK, CARRY, MOVE],
             advanced: [WORK, WORK, MOVE, MOVE, CARRY, CARRY]
         },
-        build: "base",
         name: "Builder",
         defaultMemory: { 
             building: false 
@@ -94,7 +82,6 @@ module.exports.settings = {
             base: [WORK, CARRY, MOVE],
             advanced: [CARRY, CARRY, WORK, WORK, MOVE, MOVE]
         },
-        build: "base",
         name: "Repairer",
         defaultMemory: { 
             repairing: false,
@@ -109,8 +96,15 @@ module.exports.settings = {
             base: [TOUGH, ATTACK, MOVE, MOVE],
             advanced: [TOUGH, ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE, MOVE]
         },
-        build: "advanced",
         name: "Fighter",
+        defaultMemory: {}
+    },
+    [roles.SCOUT]: {
+        priority: 10,
+        parts: {
+            base: [WORK, CARRY, MOVE, MOVE],
+        },
+        name: "Scout",
         defaultMemory: {}
     }
 }

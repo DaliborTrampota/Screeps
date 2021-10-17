@@ -16,24 +16,32 @@ module.exports = class Util {
     }
 
     /** @param {Creep} creep */
-    static findDepositTarget(creep){
+    static findDepositTarget(creep, resource = RESOURCE_ENERGY){
         //First find priority strucutres such as spawn and extensions or towers
-        let target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: s => PRIORITY_ENERGY.includes(s.structureType) && s.store.getFreeCapacity(RESOURCE_ENERGY) !== 0 })
+        let target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: s => PRIORITY_ENERGY.includes(s.structureType) && s.store.getFreeCapacity(resource) !== 0 })
         if(target) return target
         
-        //If none are found find storage boxes around Room controller or spawn if no controller - TODO give storages types and dont deposit to ones next to source
-        let obj = creep.room.controller || _.find(Game.spawns, s => s.room === creep.room)
-        target = obj.pos.findInRange(FIND_STRUCTURES, 5, { filter: s => STORAGE_STRUCTS.includes(s.structureType) && s.store.getFreeCapacity(RESOURCE_ENERGY) !== 0 })
-        if(target) return target[0]
+        if(resource === RESOURCE_ENERGY){
+            //If none are found find storage boxes around Room controller or spawn if no controller - TODO give storages types and dont deposit to ones next to source
+            let obj = creep.room.controller || _.find(Game.spawns, s => s.room === creep.room)
+            target = obj.pos.findInRange(FIND_STRUCTURES, 5, { filter: s => STORAGE_STRUCTS.includes(s.structureType) && s.store.getFreeCapacity(resource) !== 0 })
+            if(target) return target[0]
+        }else{
+            let spawn =  _.find(Game.spawns, s => s.room === creep.room)
+            target = spawn.pos.findClosestByRange(FIND_STRUCTURES, { filter: s => STORAGE_STRUCTS.includes(s.structureType) && s.store.getFreeCapacity(resource) !== 0 })
+            if(target) return target
+        }
 
         return false
     }
 
     /** @param {Creep} creep */
-    static findEnergy(creep){
+    static findEnergy(creep, findDropped = true){
         //First find on ground
-        let dropped = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, { filter: r => r.resourceType === RESOURCE_ENERGY })
-        if(dropped) return dropped
+        if(findDropped){
+            let dropped = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, { filter: r => r.resourceType === RESOURCE_ENERGY })
+            if(dropped) return dropped
+        }
         
         //Find in storages 
         let target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: s => STORAGE_STRUCTS.includes(s.structureType) && s.store[RESOURCE_ENERGY] !== 0 })

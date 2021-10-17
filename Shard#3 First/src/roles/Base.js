@@ -39,18 +39,18 @@ module.exports = class BaseRole {
     
     /** @param {Creep} creep */
     static harvestEnergy(creep){
-        let source = creep.pos.findClosestByRange(FIND_SOURCES)
+        let source = creep.pos.findClosestByPath(FIND_SOURCES) || creep.pos.findClosestByRange(FIND_SOURCES)
         if(creep.harvest(source) == ERR_NOT_IN_RANGE)
             creep.moveTo(source)
         
     }
 
     /** @param {Spawn} spawn */
-    static spawn(spawn, name, memory){
+    static spawn(spawn, name, memory, type = 'base'){
         if(!memory.role) return console.log(`Cant spawn ${name} - no role provided`)
 
         let set = settings[memory.role]
-        return spawn.spawnCreep(set.parts[set.build], name, { memory })
+        return spawn.spawnCreep(set.parts[type], name, { memory })
     }
 
     /** @param {Creep} creep */

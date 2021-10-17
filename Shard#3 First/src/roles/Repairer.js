@@ -20,15 +20,12 @@ module.exports = class Repairer extends Base {
 
         if(creep.memory.repairing){
             let target = Game.getObjectById(creep.memory.repairQueue[0])
-            while(!target && creep.memory.repairQueue.length){
+            //If the target doesnt exist anymore or if the target is already repaired or if the wall is repaired above the threshold and while there is something to repair in the queue
+            while((!target || target.hits === target.hitsMax || ([STRUCTURE_RAMPART, STRUCTURE_WALL].includes(target.structureType) && target.hits >= WALL_THRESHOLD)) && creep.memory.repairQueue.length){
                 creep.memory.repairQueue.shift()
                 target = Game.getObjectById(creep.memory.repairQueue[0])
             }
             if(!target) return //TODO fill the repair queue again instead of wait for next tick?
-            //if((target.structureType == STRUCTURE_WALL || target.structureType == STRUCTURE_RAMPART) && target.hits >= WALL_THRESHOLD){
-            //    console.log('Wall was repaired above the threshold')
-                //return creep.memory.repairQueue.shift()
-            //}
             if(creep.repair(target) === ERR_NOT_IN_RANGE)
                 creep.moveTo(target, { visualizePathStyle: { stroke: settings[creep.memory.role].pathColor }})
             return
@@ -52,48 +49,54 @@ module.exports = class Repairer extends Base {
             creep.say('Repairing')
         }
         
-        if(!creep.memory.repairQueue.length){
+        if(!creep.memory.repairQueue.length)
+            creep.memory.repairQueue = this.getRepairQueue(creep)
             //if(!creep.room.memory.toRepair.length)
             //    creep.room.memory.toRepair = creep.room.find(FIND_STRUCTURES, { filter: s => s.hits !== s.hitsMax }).map(s => s.id)
-            let toRepair = creep.room.find(FIND_STRUCTURES, { filter: s => s.hits !== s.hitsMax })
-
-            //let toRepair = creep.room.memory.toRepair.map(id => Game.getObjectById(id)).filter(s => s && s.hits !== s.hitsMax)
-            let filteredRepair = []
             
-            switch(Number(creep.memory.type)){
-                case repairTypes.ROAD: default:
-                    console.log("Default road")
-                    filteredRepair = toRepair.filter(s => s.structureType === STRUCTURE_ROAD)
-                    break
+    }
 
-                case repairTypes.STRUCTURE:
-                    console.log("Struct")
-                    filteredRepair = toRepair.filter(s => STORAGE_STRUCTS.includes(s.structureType) && s.hitsMax - s.hits)
-                    break
+    static getRepairQueue(creep){
+        const memRoom = Memory.rooms[creep.room.name]
+        if(!memRoom.toRepair || memRoom.toRepair.tick != Game.tick) //Refresh the queue every tick not for every repairer in the tick
+            memRoom.toRepair = { tick: Game.time, queue: creep.room.find(FIND_STRUCTURES, { filter: s => s.hits !== s.hitsMax })}
 
-                case repairTypes.WALL:
-                    console.log("Wall")
-                    filteredRepair = toRepair.filter(s => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(s.structureType) && s.hits < WALL_THRESHOLD)
-                    break
-            }
-            if(!toRepair.length) return console.log("Nothing to repair")
+        if(!memRoom.toRepair.queue.length) return console.log("Nothing to repair")
+        let filteredRepair = []
+        //let toRepair = creep.room.memory.toRepair.map(id => Game.getObjectById(id)).filter(s => s && s.hits !== s.hitsMax)
+        switch(Number(creep.memory.type)){
+            case repairTypes.ROAD:
+                filteredRepair = memRoom.toRepair.queue.filter(s => s.structureType === STRUCTURE_ROAD)
+                break
 
-            if(!filteredRepair.length) {
-                filteredRepair = toRepair.filter(s => ![STRUCTURE_WALL, STRUCTURE_RAMPART].includes(s.structureType))
-                console.log(`No ${creep.memory.type == 0 ? 'roads' : creep.memory.type == 1 ? 'structures' : 'walls'} to repair.`)
-            }
+            case repairTypes.STRUCTURE:
+                filteredRepair = memRoom.toRepair.queue.filter(s => STORAGE_STRUCTS.includes(s.structureType) && s.hitsMax - s.hits)
+                break
 
-            
-            filteredRepair.sort((a, b) => (a.hits / a.hitsMax) - (b.hits / b.hitsMax))//from lowest % of hits to the highest eg: structures with less hits will be priotized
-            
-            creep.memory.repairQueue = filteredRepair.slice(0, REPAIR_QUEUE_LEN).map(s => s.id)
-            for(let i = toRepair.length - 1; i >= 0; --i){
-                if(creep.memory.repairQueue.includes(toRepair[i]))
-                    toRepair.splice(i, 1)
-            }
-            //creep.room.memory.toRepair = toRepair.map(s => s.id)
-            creep.say('Filled queue!')
+            case repairTypes.WALL:
+                filteredRepair = memRoom.toRepair.queue.filter(s => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(s.structureType) && s.hits < WALL_THRESHOLD)
+                break
+
+            default:
+                console.log("default", JSON.stringify(creep.memory), creep.name)
+                filteredRepair = memRoom.toRepair.queue.filter(s => s.structureType === STRUCTURE_ROAD)
+                break
         }
+
+        if(!filteredRepair.length) {
+            filteredRepair = memRoom.toRepair.queue.filter(s => ![STRUCTURE_WALL, STRUCTURE_RAMPART].includes(s.structureType))
+            //console.log(`No ${creep.memory.type == 0 ? 'roads' : creep.memory.type == 1 ? 'structures' : 'walls'} to repair.`)
+        }
+        //from lowest % of hits to the highest eg: structures with less hits will be priotized
+        filteredRepair.sort((a, b) => (a.hits / a.hitsMax) - (b.hits / b.hitsMax))
+        const creepQueue = filteredRepair.slice(0, REPAIR_QUEUE_LEN).map(s => s.id)
+        //Remove the queued from the queue so no two creeps are repairign the same object
+        for(let i = memRoom.toRepair.queue.length - 1; i >= 0; --i){
+            if(creepQueue.includes(memRoom.toRepair.queue[i]))
+                memRoom.toRepair.queue.splice(i, 1)
+        }
+        creep.say('Filled queue!')
+        return creepQueue
     }
 
     static assignType(creep){
