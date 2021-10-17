@@ -18,6 +18,8 @@ module.exports.loop = function () {
 
 
 	for(let roomName in Game.rooms){
+		if(!Memory.rooms[roomName]) Memory.rooms[roomName] = {}
+		if(!Memory.rooms[roomName].toRepair) Memory.rooms[roomName].toRepair = []
 		//if(Memory.sources[roomName].closestToController) continue
 
 		if(!Memory.sources[roomName]){

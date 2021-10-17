@@ -16,11 +16,11 @@ module.exports.STORAGE_STRUCTS = [STRUCTURE_STORAGE, STRUCTURE_CONTAINER, STRUCT
 module.exports.PRIORITY_ENERGY = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_TOWER]
 
 module.exports.population = {
-    [roles.HARVESTER]: 4,
+    [roles.HARVESTER]: 3,
     [roles.UPGRADER]: 1,
     [roles.BUILDER]: 1,
-    [roles.RUNNER]: 2,
-    [roles.REPAIRER]: 3,
+    [roles.RUNNER]: 0,
+    [roles.REPAIRER]: 2,
     [roles.FIGHTER]: 0
 }
 
@@ -47,7 +47,7 @@ module.exports.settings = {
             base: [WORK, MOVE, CARRY],
             advanced: [WORK, WORK, WORK, MOVE, CARRY]
         },
-        build: "advanced",
+        build: "base",
         name: "Harvester",
         defaultMemory: {}
     },
@@ -57,7 +57,7 @@ module.exports.settings = {
             base: [WORK, MOVE, CARRY],
             advanced: [WORK, WORK, CARRY, CARRY, MOVE, MOVE]
         },
-        build: "advanced",
+        build: "base",
         name: "Upgrader",
         defaultMemory: { 
             upgrading: false 
@@ -82,7 +82,7 @@ module.exports.settings = {
             base: [WORK, CARRY, MOVE],
             advanced: [WORK, WORK, MOVE, MOVE, CARRY, CARRY]
         },
-        build: "advanced",
+        build: "base",
         name: "Builder",
         defaultMemory: { 
             building: false 
@@ -94,7 +94,7 @@ module.exports.settings = {
             base: [WORK, CARRY, MOVE],
             advanced: [CARRY, CARRY, WORK, WORK, MOVE, MOVE]
         },
-        build: "advanced",
+        build: "base",
         name: "Repairer",
         defaultMemory: { 
             repairing: false,

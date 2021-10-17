@@ -10,6 +10,8 @@ module.exports = class Builder extends Base {
 
         if(creep.memory.building){
             let structure = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES)
+            if(!structure) return this.idle(creep)
+            
             if(creep.build(structure) === ERR_NOT_IN_RANGE)
                 creep.moveTo(structure, { visualizePathStyle: { stroke: '#ffffff' }})
             return
