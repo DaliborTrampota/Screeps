@@ -29,7 +29,7 @@ module.exports.loop = function () {
 
 	for(let creepName in Game.creeps){
 		const creep = Game.creeps[creepName]
-		if(!creep.memory) return console.log(`${creepName} - no memory`)
+		if(creep.spawning) continue
 
 		if(creep.memory.role == undefined || creep.memory.role == null ) {
 			console.log(`Creep ${creep.name} has no role`)

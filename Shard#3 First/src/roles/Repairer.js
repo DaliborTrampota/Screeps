@@ -9,14 +9,9 @@ module.exports = class Repairer extends Base {
         
         this.checkState(creep)
 
-        //If nothing to repair become a Runner
-        if(!creep.memory.repairQueue.length){
-            //return this.idle(creep)
-            creep.memory.repairing = false
-            if(creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0)
-                return this.dropEnergy(creep)
-            
-        }
+        //If nothing to repair become a Runner?
+        if(!creep.memory.repairQueue.length)
+            return this.idle(creep)
 
         if(creep.memory.repairing){
             let target = Game.getObjectById(creep.memory.repairQueue[0])
@@ -37,7 +32,7 @@ module.exports = class Repairer extends Base {
     /** @param {Creep} creep */
     static checkState(creep){
         if(creep.memory.type == repairTypes.NONE)
-            creep.memory.type = this.assignType(creep)
+            this.assignType(creep)
 
         if(creep.memory.repairing && creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0){
             creep.memory.repairing = false
@@ -63,6 +58,7 @@ module.exports = class Repairer extends Base {
 
         if(!memRoom.toRepair.queue.length) return console.log("Nothing to repair")
         let filteredRepair = []
+
         //let toRepair = creep.room.memory.toRepair.map(id => Game.getObjectById(id)).filter(s => s && s.hits !== s.hitsMax)
         switch(Number(creep.memory.type)){
             case repairTypes.ROAD:
@@ -79,17 +75,18 @@ module.exports = class Repairer extends Base {
 
             default:
                 console.log("default", JSON.stringify(creep.memory), creep.name)
+                this.assignType(creep)
                 filteredRepair = memRoom.toRepair.queue.filter(s => s.structureType === STRUCTURE_ROAD)
                 break
         }
 
-        if(!filteredRepair.length) {
+        if(!filteredRepair.length)
             filteredRepair = memRoom.toRepair.queue.filter(s => ![STRUCTURE_WALL, STRUCTURE_RAMPART].includes(s.structureType))
-            //console.log(`No ${creep.memory.type == 0 ? 'roads' : creep.memory.type == 1 ? 'structures' : 'walls'} to repair.`)
-        }
+        
         //from lowest % of hits to the highest eg: structures with less hits will be priotized
         filteredRepair.sort((a, b) => (a.hits / a.hitsMax) - (b.hits / b.hitsMax))
         const creepQueue = filteredRepair.slice(0, REPAIR_QUEUE_LEN).map(s => s.id)
+
         //Remove the queued from the queue so no two creeps are repairign the same object
         for(let i = memRoom.toRepair.queue.length - 1; i >= 0; --i){
             if(creepQueue.includes(memRoom.toRepair.queue[i]))
@@ -121,7 +118,6 @@ module.exports = class Repairer extends Base {
         if(!struct) return creep.memory.type = repairTypes.STRUCTURE
         if(!road) return creep.memory.type = repairTypes.ROAD
         if(!wall) return creep.memory.type = repairTypes.WALL
-        console.log('Assigned ROAD')
 
         creep.memory.type = repairTypes.ROAD
     }

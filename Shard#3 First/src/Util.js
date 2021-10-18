@@ -36,11 +36,13 @@ module.exports = class Util {
     }
 
     /** @param {Creep} creep */
-    static findEnergy(creep, findDropped = true){
+    static findEnergy(creep, findDropped = true, opt = { filter: r => r.resourceType == RESOURCE_ENERGY }){
         //First find on ground
         if(findDropped){
-            let dropped = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, { filter: r => r.resourceType === RESOURCE_ENERGY })
+            let dropped = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, opt)
             if(dropped) return dropped
+            let tombstone = this.findTombstone(creep, RESOURCE_ENERGY)
+            if(tombstone) return tombstone
         }
         
         //Find in storages 
@@ -48,6 +50,11 @@ module.exports = class Util {
         if(target) return target
 
         return false
+    }
+
+    /** @param {Creep} creep */
+    static findTombstone(creep, resource = false){
+        return creep.pos.findClosestByPath(FIND_TOMBSTONES, { filter: t => resource ? t.store.getUsedCapacity(resource) !== 0 : t.store.getUsedCapacity() !== 0 }) || false
     }
 
     /** @param {Room} room */

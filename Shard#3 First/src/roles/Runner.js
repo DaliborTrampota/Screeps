@@ -41,7 +41,7 @@ module.exports = class Runner extends Base{
             }
 
             if(!creep.memory.withdrawTarget){
-                let target = this.findDroppedMinerals(creep) || Util.findEnergy(creep, false)
+                let target = this.findOnGround(creep) || Util.findEnergy(creep, true, {})
                 if(target) creep.memory.withdrawTarget = target.id
             }
         }
@@ -60,11 +60,8 @@ module.exports = class Runner extends Base{
     }
 
     /** @param {Creep} creep */
-    static findDroppedMinerals(creep){
-        let dropped = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES)
-        if(dropped) return dropped
-
-        return false
+    static findOnGround(creep){
+        return Util.findTombstone(creep)
     }
 
 }
