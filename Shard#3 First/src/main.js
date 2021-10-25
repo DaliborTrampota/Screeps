@@ -53,6 +53,11 @@ module.exports.loop = function () {
 			case STRUCTURE_TOWER:
 				require('./structures/Tower').run(struct)
 				break
+
+			case STRUCTURE_LINK:
+				require('./structures/Link').run(struct)
+				break
+
 		}
 	}
 

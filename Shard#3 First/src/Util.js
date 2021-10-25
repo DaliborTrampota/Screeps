@@ -6,8 +6,10 @@ module.exports = class Util {
     static getHarvesterTarget(creep){
         //First find storage struct in 3 block radius around  the creep. The creep should be next to energy source when this fnc runs
         let target = creep.pos.findClosestByRange(FIND_STRUCTURES, { 
-            filter: s => STORAGE_STRUCTS.includes(s.structureType) && s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY) && s.pos.inRangeTo(creep, 3) })
+            filter: s => STORAGE_STRUCTS.includes(s.structureType) && s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY) && s.pos.inRangeTo(creep, 3)
+        })
         if(target) return { id: target.id, temp: false }
+        if(creep.room.storage) return { id: creep.room.storage.id, temp: true }
 
         //If none found find closest deposit target
         let depositTarget = this.findDepositTarget(creep)
@@ -23,8 +25,10 @@ module.exports = class Util {
         
         if(resource === RESOURCE_ENERGY){
             //If none are found find storage boxes around Room controller or spawn if no controller - TODO give storages types and dont deposit to ones next to source
-            let obj = creep.room.controller || _.find(Game.spawns, s => s.room === creep.room)
-            target = obj.pos.findInRange(FIND_STRUCTURES, 5, { filter: s => STORAGE_STRUCTS.includes(s.structureType) && s.store.getFreeCapacity(resource) !== 0 })
+            let controller = creep.room.controller// || _.find(Game.spawns, s => s.room === creep.room)
+            if(controller) target = controller.pos.findInRange(FIND_STRUCTURES, 5, { filter: s => STORAGE_STRUCTS.includes(s.structureType) && s.store.getFreeCapacity(resource) !== 0 })
+            else target = creep.room.find(FIND_STRUCTURES, { filter: s => STORAGE_STRUCTS.includes(s.structureType) && s.store.getFreeCapacity(resource) !== 0 })
+
             if(target) return target[0]
         }else{
             let spawn =  _.find(Game.spawns, s => s.room === creep.room)
@@ -62,9 +66,7 @@ module.exports = class Util {
         let sources = Memory.sources[room.name]
         let lessUsed = { id: null, count: Infinity }
         for(let sID in sources){//TODO if same usage take path into consideration
-            //if(sID === 'closestToController') continue
-            if(sources[sID] > lessUsed.count) continue
-            lessUsed = { id: sID, count: sources[sID] }
+            if(sources[sID] < lessUsed.count) lessUsed = { id: sID, count: sources[sID] }
         }
         return lessUsed
     }
